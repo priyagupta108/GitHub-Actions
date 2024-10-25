@@ -160,7 +160,8 @@ runs:
       # source prefixes" step with the dictionary version tag that belongs to the commit of the release. See
       # https://github.com/check-spelling/check-spelling/blob/v0.0.22/action.yml#L67 for current version.
       # Also update check_extra_dictionaries below as necessary.
-      uses: check-spelling/check-spelling@2c9e4a85102fa9b6df3cb8bb5a8dc8bdc2fb2fea # v0.0.23
+      # Prerelease for https://github.com/check-spelling/check-spelling/issues/70#issuecomment-2436801537.
+      uses: check-spelling/check-spelling@0957cb7d5aed21a9d2976499f101ec014c6f53d6
       with:
         check_file_names: 1
         config: ${{ inputs.configuration-path }}
