@@ -337,6 +337,16 @@ jobs:
           xunit-max-parallel-threads: ${{ inputs.xunit-max-parallel-threads }}
           enable-diagnostic-mode: ${{ inputs.enable-test-diagnostic-mode }}
 
+      - name: Test residual Chrome processes
+        if: runner.os == 'Linux'
+        shell: bash
+        run: sudo pgrep chrome
+
+      - name: Test residual Edge processes
+        if: runner.os == 'Linux'
+        shell: bash
+        run: sudo pgrep msedge
+
       - name: Cancel Workflow on Failure
         if: failure() && inputs.cancel-workflow-on-failure == 'true'
         uses: Lombiq/GitHub-Actions/.github/actions/cancel-workflow@dev
