@@ -13,6 +13,7 @@ runs:
       shell: pwsh
       run: Initialize-SqlServer
 
+    # Installs the SQL Server command-line tools if they're not present (necessary for Ubuntu 24.04-based runners).
     - name: Install sqlcmd
       uses: Lombiq/GitHub-Actions/.github/actions/install-sqlcmd@issue/INFRA-164
 
