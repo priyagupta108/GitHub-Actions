@@ -337,15 +337,13 @@ jobs:
           xunit-max-parallel-threads: ${{ inputs.xunit-max-parallel-threads }}
           enable-diagnostic-mode: ${{ inputs.enable-test-diagnostic-mode }}
 
-      - name: Test residual Chrome processes
-        if: runner.os == 'Linux'
-        shell: bash
-        run: sudo pgrep chrome
+      - name: SSH on GitHub-hosted runners
+        if: runner.os == 'Linux' && !contains(runner.name, 'warp')
+        uses: mxschmitt/action-tmate@e5c7151931ca95bad1c6f4190c730ecf8c7dde48 # v3.19
 
-      - name: Test residual Edge processes
-        if: runner.os == 'Linux'
-        shell: bash
-        run: sudo pgrep msedge
+      - name: SSH on WarpBuild-hosted runners
+        if: runner.os == 'Linux' && contains(runner.name, 'warp')
+        uses: WarpBuilds/action-debugger@4f5fd557c0ec91cdf9395b2853a3387b6cfd0738 # v1.3
 
       - name: Cancel Workflow on Failure
         if: failure() && inputs.cancel-workflow-on-failure == 'true'
