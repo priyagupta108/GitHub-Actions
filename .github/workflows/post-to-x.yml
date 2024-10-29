@@ -27,7 +27,7 @@ on:
 jobs:
   preview:
     name: Preview X (Twitter) Post
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event_name == 'pull_request'
     steps:
       - uses: twitter-together/action@08857009da2aacd9bd08204550ec96e15d76b4da # v3.1.0
@@ -36,7 +36,7 @@ jobs:
 
   post-to-x:
     name: Post to X (Twitter)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
     steps:
       - name: Checkout

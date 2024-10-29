@@ -43,7 +43,7 @@ on:
         default: 'false'
       machine-type:
         type: string
-        default: ubuntu-22.04
+        default: ubuntu-24.04
         description: The name of the type of machine to run the workflow under.
       timeout-minutes:
         type: number
