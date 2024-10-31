@@ -58,7 +58,7 @@ on:
         type: string
       merge-target:
         required: false
-        default: 'issue/OSOE-912-release-target'
+        default: issue/OSOE-912-release-target
         description: >
           The target branch to merge back to after setting the GitHub Actions and Workflows to the version tag. This is
           necessary because otherwise, the auto-generated release notes will include all the changes since the start of
