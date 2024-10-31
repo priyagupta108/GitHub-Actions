@@ -58,7 +58,7 @@ on:
         type: string
       merge-target:
         required: false
-        default: ${{ github.event.repository.default_branch }}
+        default: 'issue/OSOE-912-release-target'
         description: >
           The target branch to merge back to after setting the GitHub Actions and Workflows to the version tag. This is
           necessary because otherwise, the auto-generated release notes will include all the changes since the start of
@@ -81,7 +81,7 @@ jobs:
       - name: Determine Version Tag Name from Branch Name
         id: determine-tag
         run: |
-          $tagname = "${{ inputs.expected-ref }}" -replace 'release/', ''
+          $tagname = 'v2.0.1-alpha.0'
           # Same as Set-GitHubOutput. But using that would require converting this to an action and duplicating the
           # parameters just to use that one script.
           "tagname=$tagname" >> $Env:GITHUB_OUTPUT
@@ -104,16 +104,6 @@ jobs:
       - name: Force Push Tag
         continue-on-error: true
         run: git push --tags --force
-
-      - name: Create Release
-        uses: Lombiq/GitHub-Actions/.github/actions/release-action@dev
-        # This is to prevent creating releases when pushing tags for issue-specific pre-releases like
-        # v4.3.1-alpha.osoe-86.
-        if: "!contains(steps.determine-tag.outputs.tagname, '-')"
-        with:
-          allowUpdates: true
-          generateReleaseNotes: true
-          tag: ${{ steps.determine-tag.outputs.tagname }}
 
       - name: Merge Back
         # Same as Create Release above.
