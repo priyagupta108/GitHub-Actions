@@ -74,7 +74,7 @@ jobs:
         shell: pwsh
     steps:
       - name: Checkout Repository
-        uses: Lombiq/GitHub-Actions/.github/actions/checkout@dev
+        uses: Lombiq/GitHub-Actions/.github/actions/checkout@v2.0.1-alpha.0
         with:
           token: ${{ secrets.TAG_VERSION_TOKEN }}
 
@@ -87,7 +87,7 @@ jobs:
           "tagname=$tagname" >> $Env:GITHUB_OUTPUT
 
       - name: Set Ref for GitHub Actions and Workflows
-        uses: Lombiq/GitHub-Actions/.github/actions/set-gha-refs@dev
+        uses: Lombiq/GitHub-Actions/.github/actions/set-gha-refs@v2.0.1-alpha.0
         with:
           path-include-list: ${{ inputs.path-include-list }}
           file-include-list: ${{ inputs.file-include-list }}
