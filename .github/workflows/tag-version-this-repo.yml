@@ -1,7 +1,6 @@
 name: Tag Version (this repo)
 
 on:
-  push:
 
 jobs:
   run:
