@@ -18,7 +18,7 @@ on:
       cancel-workflow-on-failure:
         description: When set to "true", it will cancel the current workflow run with all jobs if this workflow fails.
         type: string
-        default: 'true'
+        default: 'false'
       verbosity:
         type: string
         default: minimal
