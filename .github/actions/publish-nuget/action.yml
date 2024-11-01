@@ -26,7 +26,10 @@ inputs:
     description: >
       The desired NuGet package version used for publishing. If not specified, the GITHUB_REF_NAME environment variable
       is used which is suitable if the version is derived from a git tag. If "USE_GITHUB_RUN_NUMBER" is used, then the
-      version is derived from the latest non-prerelease version tag and the current run number.
+      version is derived from the latest non-prerelease version tag and the current run number to create a preview
+      version (e.g. "1.0.1-preview-1" if the current version is 1.0.0). With "USE_NEXT_PATCH_VERSION" the version is
+      derived from the latest non-prerelease version tag to create the next patch version (e.g. "1.0.1" if the current
+      version is 1.0.0).
   nuget-artifact-retention-days:
     required: false
     default: '14'
@@ -91,10 +94,10 @@ runs:
             Sort-Object -Descending
         $current = if ($tags.Count -gt 0) { $tags[0] } else { [version]"0.0.0" }
 
-        if ($version -eq 'USE_GITHUB_RUN_NUMBER')
+        if ($version -eq 'USE_GITHUB_RUN_NUMBER' -or $version -eq 'USE_NEXT_PATCH_VERSION')
         {
             $next = New-Object "System.Version" $current.Major, $current.Minor, ($current.Build + 1)
-            $version = "$next-preview-$Env:GITHUB_RUN_NUMBER"
+            $version = "$next($version -eq 'USE_GITHUB_RUN_NUMBER' ? '-preview-$Env:GITHUB_RUN_NUMBER' : '')"
         }
 
         if ($tags.Count -gt 1)
