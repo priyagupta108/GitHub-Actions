@@ -39,6 +39,12 @@ inputs:
     required: false
     default: 'true'
     description: If set to "true", the Microsoft.SourceLink.GitHub NuGet package is added to the projects.
+  dry-run:
+    required: false
+    default: 'false'
+    description: |
+      If set to "true", the action will perform all package creation and validation steps without actually publishing to
+      NuGet or creating a GitHub release.
 
 runs:
   using: composite
@@ -186,7 +192,7 @@ runs:
       # * p:EnablePackageValidation=true is for package validation, see:
       #   https://docs.microsoft.com/en-us/dotnet/fundamentals/package-validation/overview.
       run: |
-        if ([string]::IsNullOrWhiteSpace($Env:API_KEY))
+        if ('${{ inputs.dry-run }}' -ne 'true' -and [string]::IsNullOrWhiteSpace($Env:API_KEY))
         {
             Write-Output "::error::API_KEY is missing or empty."
             exit 1
@@ -221,7 +227,13 @@ runs:
 
         New-NuGetPackage @parameters
 
+        if ('${{ inputs.dry-run }}' -eq 'true')
+        {
+            Write-Output "::notice::Dry run mode: Package created successfully but will not be published."
+        }
+
     - name: Push with dotnet
+      if: inputs.dry-run != 'true'
       shell: pwsh
       run: dotnet nuget push artifacts/*.nupkg --api-key $Env:API_KEY --source '${{ steps.setup.outputs.source-url }}' --skip-duplicate
 
@@ -234,9 +246,8 @@ runs:
 
     - name: Create Release
       uses: Lombiq/GitHub-Actions/.github/actions/release-action@dev
-      # This is to prevent creating releases when pushing tags for issue-specific pre-releases like
-      # v4.3.1-alpha.osoe-86.
-      if: "!contains(steps.setup.outputs.publish-version, '-')"
+      # Also preventing creating releases when pushing tags for issue-specific pre-releases like v4.3.1-alpha.osoe-86.
+      if: inputs.dry-run != 'true' && !contains(steps.setup.outputs.publish-version, '-')
       with:
         allowUpdates: true
         generateReleaseNotes: true

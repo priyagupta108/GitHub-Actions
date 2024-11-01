@@ -8,7 +8,6 @@ on:
         description: >
           The GitHub token to authenticate checkout. Pass in a GitHub personal access token if authenticated submodules
           are used.
-      # We can't access org secrets here so they need to be passed in.
       API_KEY:
         required: true
         description: >
@@ -69,6 +68,12 @@ on:
         type: string
         default: 'true'
         description: If set to "true", the Microsoft.SourceLink.GitHub NuGet package is added to the projects.
+      dry-run:
+        required: false
+        default: 'false'
+        description: |
+          If set to "true", the action will perform all package creation and validation steps without actually publishing
+          to NuGet or creating a GitHub release.
 
 jobs:
   publish-nuget:
@@ -91,7 +96,7 @@ jobs:
           dotnet-version: ${{ inputs.dotnet-version }}
 
       - name: Publish to NuGet
-        uses: Lombiq/GitHub-Actions/.github/actions/publish-nuget@dev
+        uses: Lombiq/GitHub-Actions/.github/actions/publish-nuget@issue/OSOE-864
         with:
           source: ${{ inputs.source }}
           verbosity: ${{ inputs.verbosity }}
@@ -100,6 +105,7 @@ jobs:
           publish-version: ${{ inputs.publish-version }}
           nuget-artifact-retention-days: ${{ inputs.nuget-artifact-retention-days }}
           add-source-link-package: ${{ inputs.add-source-link-package }}
+          dry-run: ${{ inputs.dry-run }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           API_KEY: ${{ secrets.API_KEY }}
