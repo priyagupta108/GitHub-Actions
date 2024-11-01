@@ -43,7 +43,7 @@ on:
         description: If set to "true", a symbol package will be created together with the NuGet package.
       nuget-artifact-retention-days:
         type: string
-        default: '0'
+        default: '1'
         description: >
           Duration in days after which the artifact of the NuGet package publishing (if any) will expire. See
           https://github.com/actions/upload-artifact#retention-period for more details.
