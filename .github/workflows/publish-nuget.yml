@@ -69,7 +69,7 @@ on:
         default: 'true'
         description: If set to "true", the Microsoft.SourceLink.GitHub NuGet package is added to the projects.
       dry-run:
-        required: false
+        type: string
         default: 'false'
         description: |
           If set to "true", the action will perform all package creation and validation steps without actually publishing
