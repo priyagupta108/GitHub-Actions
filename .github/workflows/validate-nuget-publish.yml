@@ -67,7 +67,7 @@ jobs:
       timeout-minutes: ${{ inputs.timeout-minutes }}
       dotnet-pack-ignore-warning: ${{ inputs.dotnet-pack-ignore-warning }}
       dotnet-pack-include-symbols: ${{ inputs.dotnet-pack-include-symbols }}
-      publish-version: ${{ inputs.publish-version }}
+      publish-version: '99999.0.0'
       nuget-artifact-retention-days: ${{ inputs.nuget-artifact-retention-days }}
       add-source-link-package: ${{ inputs.add-source-link-package }}
       dry-run: 'true'
