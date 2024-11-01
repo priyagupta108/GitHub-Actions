@@ -39,7 +39,7 @@ on:
 jobs:
   markdown-linting:
     name: Markdown Linting
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: ${{ inputs.timeout-minutes }}
     steps:
       - name: Checkout
