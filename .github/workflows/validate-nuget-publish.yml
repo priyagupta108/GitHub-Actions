@@ -67,7 +67,7 @@ jobs:
       nuget-artifact-retention-days: ${{ inputs.nuget-artifact-retention-days }}
       add-source-link-package: ${{ inputs.add-source-link-package }}
       dry-run: true
-    env:
+    secrets:
       CHECKOUT_TOKEN: ${{ secrets.CHECKOUT_TOKEN }}
       API_KEY: dummy
       ENVIRONMENT_VARIABLES_JSON: ${{ secrets.ENVIRONMENT_VARIABLES_JSON }}
