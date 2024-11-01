@@ -97,7 +97,7 @@ runs:
         if ($version -eq 'USE_GITHUB_RUN_NUMBER' -or $version -eq 'USE_NEXT_PATCH_VERSION')
         {
             $next = New-Object "System.Version" $current.Major, $current.Minor, ($current.Build + 1)
-            $version = "$next($version -eq 'USE_GITHUB_RUN_NUMBER' ? '-preview-$Env:GITHUB_RUN_NUMBER' : '')"
+            $version = "$next$($version -eq 'USE_GITHUB_RUN_NUMBER' ? "-preview-$Env:GITHUB_RUN_NUMBER" : '')"
         }
 
         if ($tags.Count -gt 1)
