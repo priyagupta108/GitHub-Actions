@@ -8,10 +8,6 @@ on:
         description: >
           The GitHub token to authenticate checkout. Pass in a GitHub personal access token if authenticated submodules
           are used.
-      API_KEY:
-        required: true
-        description: >
-          The API key to authenticate with the NuGet server when pushing packages.
       ENVIRONMENT_VARIABLES_JSON:
         required: false
         description: >
@@ -67,11 +63,11 @@ jobs:
       timeout-minutes: ${{ inputs.timeout-minutes }}
       dotnet-pack-ignore-warning: ${{ inputs.dotnet-pack-ignore-warning }}
       dotnet-pack-include-symbols: ${{ inputs.dotnet-pack-include-symbols }}
-      publish-version: '99999.0.0'
+      publish-version: 99999.0.0
       nuget-artifact-retention-days: ${{ inputs.nuget-artifact-retention-days }}
       add-source-link-package: ${{ inputs.add-source-link-package }}
-      dry-run: 'true'
+      dry-run: true
     env:
       CHECKOUT_TOKEN: ${{ secrets.CHECKOUT_TOKEN }}
-      API_KEY: ${{ secrets.API_KEY }}
+      API_KEY: dummy
       ENVIRONMENT_VARIABLES_JSON: ${{ secrets.ENVIRONMENT_VARIABLES_JSON }}
