@@ -45,7 +45,7 @@ on:
       timeout-minutes:
         type: number
         default: 360
-        description: Configuration for the timeout-minutes parameter of the workflow. The 360 is GitHub's default.
+        description: Configuration for the timeout-minutes parameter of the workflow. 360 is GitHub's default.
       app-name:
         required: true
         type: string
