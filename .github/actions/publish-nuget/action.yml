@@ -195,12 +195,6 @@ runs:
       # * p:EnablePackageValidation=true is for package validation, see:
       #   https://docs.microsoft.com/en-us/dotnet/fundamentals/package-validation/overview.
       run: |
-        if ('${{ inputs.dry-run }}' -ne 'true' -and [string]::IsNullOrWhiteSpace($Env:API_KEY))
-        {
-            Write-Output "::error::API_KEY is missing or empty."
-            exit 1
-        }
-
         $noWarn = @('NU5104%3BCS1573%3BCS1591%3BVSTHRD002%3BVSTHRD200') + @'
         ${{ inputs.dotnet-pack-ignore-warning }}
         '@.Split() | ? { $_ }
@@ -238,7 +232,13 @@ runs:
     - name: Push with dotnet
       if: inputs.dry-run != 'true'
       shell: pwsh
-      run: dotnet nuget push artifacts/*.nupkg --api-key $Env:API_KEY --source '${{ steps.setup.outputs.source-url }}' --skip-duplicate
+      run: |
+        if ([string]::IsNullOrWhiteSpace($Env:API_KEY))
+        {
+            Write-Output "::error::API_KEY is missing or empty."
+            exit 1
+        }
+        dotnet nuget push artifacts/*.nupkg --api-key $Env:API_KEY --source '${{ steps.setup.outputs.source-url }}' --skip-duplicate
 
     - name: Publish Artifacts
       uses: Lombiq/GitHub-Actions/.github/actions/upload-artifact@dev
