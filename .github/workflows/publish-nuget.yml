@@ -73,7 +73,7 @@ on:
         default: 'false'
         description: |
           If set to "true", the action will perform all package creation and validation steps without actually publishing
-          to NuGet or creating a GitHub release.
+          the NuGet package or creating a GitHub release.
 
 jobs:
   publish-nuget:
