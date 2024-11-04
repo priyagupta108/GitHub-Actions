@@ -1,0 +1,73 @@
+name: Validate NuGet Publish
+
+on:
+  workflow_call:
+    secrets:
+      CHECKOUT_TOKEN:
+        required: false
+        description: >
+          The GitHub token to authenticate checkout. Pass in a GitHub personal access token if authenticated submodules
+          are used.
+      ENVIRONMENT_VARIABLES_JSON:
+        required: false
+        description: >
+          A JSON string containing key-value pairs of environment variables to be set. You can use this to pass in
+          arbitrary environment variables that can be used to e.g. customize the build or test execution.
+
+    inputs:
+      cancel-workflow-on-failure:
+        description: When set to "true", it will cancel the current workflow run with all jobs if this workflow fails.
+        type: string
+        default: 'false'
+      verbosity:
+        type: string
+        default: minimal
+        description: The logging verbosity type used by the `dotnet` command.
+      dotnet-version:
+        type: string
+        default: 8.0.301
+        description: Version of the .NET SDK to set up.
+      timeout-minutes:
+        type: number
+        default: 15
+        description: Configuration for the timeout-minutes parameter of the workflow. 360 is GitHub's default.
+      dotnet-pack-ignore-warning:
+        type: string
+        default: ''
+        description: >
+          Additional warning codes for the `-p:NoWarn=` argument of `dotnet pack`. The items can be separated by any
+          whitespace, including newlines.
+      dotnet-pack-include-symbols:
+        type: string
+        default: 'true'
+        description: If set to "true", a symbol package will be created together with the NuGet package.
+      nuget-artifact-retention-days:
+        type: string
+        default: '1'
+        description: >
+          Duration in days after which the artifact of the NuGet package publishing (if any) will expire. See
+          https://github.com/actions/upload-artifact#retention-period for more details.
+      add-source-link-package:
+        type: string
+        default: 'true'
+        description: If set to "true", the Microsoft.SourceLink.GitHub NuGet package is added to the projects.
+
+jobs:
+  validate-nuget-publish:
+    name: Validate NuGet Publish
+    uses: Lombiq/GitHub-Actions/.github/workflows/publish-nuget.yml@dev
+    with:
+      cancel-workflow-on-failure: ${{ inputs.cancel-workflow-on-failure }}
+      verbosity: ${{ inputs.verbosity }}
+      dotnet-version: ${{ inputs.dotnet-version }}
+      timeout-minutes: ${{ inputs.timeout-minutes }}
+      dotnet-pack-ignore-warning: ${{ inputs.dotnet-pack-ignore-warning }}
+      dotnet-pack-include-symbols: ${{ inputs.dotnet-pack-include-symbols }}
+      publish-version: USE_NEXT_PATCH_VERSION
+      nuget-artifact-retention-days: ${{ inputs.nuget-artifact-retention-days }}
+      add-source-link-package: ${{ inputs.add-source-link-package }}
+      dry-run: true
+    secrets:
+      CHECKOUT_TOKEN: ${{ secrets.CHECKOUT_TOKEN }}
+      API_KEY: not needed
+      ENVIRONMENT_VARIABLES_JSON: ${{ secrets.ENVIRONMENT_VARIABLES_JSON }}
