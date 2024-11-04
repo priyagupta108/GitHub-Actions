@@ -58,7 +58,7 @@ on:
         type: string
       merge-target:
         required: false
-        default: issue/OSOE-912-release-target
+        default: ${{ github.event.repository.default_branch }}
         description: >
           The target branch to merge back to after setting the GitHub Actions and Workflows to the version tag. This is
           necessary because otherwise, the auto-generated release notes will include all the changes since the start of
@@ -74,21 +74,20 @@ jobs:
         shell: pwsh
     steps:
       - name: Checkout Repository
-        uses: Lombiq/GitHub-Actions/.github/actions/checkout@v2.0.1-alpha.0
+        uses: Lombiq/GitHub-Actions/.github/actions/checkout@dev
         with:
           token: ${{ secrets.TAG_VERSION_TOKEN }}
-          fetch-depth: 0
 
       - name: Determine Version Tag Name from Branch Name
         id: determine-tag
         run: |
-          $tagname = 'v2.0.1-alpha.0'
+          $tagname = "${{ inputs.expected-ref }}" -replace 'release/', ''
           # Same as Set-GitHubOutput. But using that would require converting this to an action and duplicating the
           # parameters just to use that one script.
           "tagname=$tagname" >> $Env:GITHUB_OUTPUT
 
       - name: Set Ref for GitHub Actions and Workflows
-        uses: Lombiq/GitHub-Actions/.github/actions/set-gha-refs@v2.0.1-alpha.0
+        uses: Lombiq/GitHub-Actions/.github/actions/set-gha-refs@dev
         with:
           path-include-list: ${{ inputs.path-include-list }}
           file-include-list: ${{ inputs.file-include-list }}
@@ -106,8 +105,19 @@ jobs:
         continue-on-error: true
         run: git push --tags --force
 
+      - name: Create Release
+        uses: Lombiq/GitHub-Actions/.github/actions/release-action@dev
+        # This is to prevent creating releases when pushing tags for issue-specific pre-releases like
+        # v4.3.1-alpha.osoe-86.
+        if: "!contains(steps.determine-tag.outputs.tagname, '-')"
+        with:
+          allowUpdates: true
+          generateReleaseNotes: true
+          tag: ${{ steps.determine-tag.outputs.tagname }}
+
       - name: Merge Back
         # Same as Create Release above.
+        if: "!contains(steps.determine-tag.outputs.tagname, '-')"
         run: |
           git fetch origin ${{ inputs.merge-target }}
           git checkout ${{ inputs.merge-target }}
@@ -115,10 +125,11 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
           # Merge without taking any changes from the release branch.
-          git merge --strategy=ours --allow-unrelated-histories --no-commit ${{ inputs.expected-ref }}
+          git merge --strategy=ours --no-commit ${{ inputs.expected-ref }}
 
       - name: Commit and Push Merge Target Changes
         # Same as Create Release above.
+        if: "!contains(steps.determine-tag.outputs.tagname, '-')"
         uses: stefanzweifel/git-auto-commit-action@8756aa072ef5b4a080af5dc8fef36c5d586e521d # v5
         with:
           commit_message: Merge remote-tracking branch '${{ inputs.expected-ref }}' into ${{ inputs.merge-target }}
