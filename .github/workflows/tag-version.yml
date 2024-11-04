@@ -16,7 +16,10 @@ on:
           Thus, we need to use an alternative authentication token. See
           https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
           for info on how to create PATs; you'll need one with the "work" scope. We recommend creating such a token from
-          under a bot user account only used for such operations, so it's not tied to a natural person.
+          under a bot user account only used for such operations, so it's not tied to a natural person. If the branch
+          designated as the merge target (see the 'merge-target' input) is protected by a ruleset, then the user account
+          associated with the token must be a member of a team (we recommend creating a dedicated team for this) that is
+          added to the bypass list of the ruleset.
     inputs:
       path-include-list:
         description: >
