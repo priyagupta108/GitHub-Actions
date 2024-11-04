@@ -6,7 +6,7 @@ on:
       - release/**
 
 jobs:
-  run:
+  tag-version:
     name: Tag Version Automation
     if: github.event.pusher.name != 'LombiqBot'
     uses: Lombiq/GitHub-Actions/.github/workflows/tag-version.yml@dev

@@ -8,7 +8,6 @@ on:
         description: >
           The GitHub token to authenticate checkout. Pass in a GitHub personal access token if authenticated submodules
           are used.
-      # We can't access org secrets here so they need to be passed in.
       API_KEY:
         required: true
         description: >
@@ -39,7 +38,7 @@ on:
       timeout-minutes:
         type: number
         default: 15
-        description: Configuration for the timeout-minutes parameter of the workflow. The 360 is GitHub's default.
+        description: Configuration for the timeout-minutes parameter of the workflow. 360 is GitHub's default.
       dotnet-pack-ignore-warning:
         type: string
         default: ''
@@ -69,6 +68,12 @@ on:
         type: string
         default: 'true'
         description: If set to "true", the Microsoft.SourceLink.GitHub NuGet package is added to the projects.
+      dry-run:
+        type: string
+        default: 'false'
+        description: |
+          If set to "true", the action will perform all package creation and validation steps without actually publishing
+          the NuGet package or creating a GitHub release.
 
 jobs:
   publish-nuget:
@@ -100,6 +105,7 @@ jobs:
           publish-version: ${{ inputs.publish-version }}
           nuget-artifact-retention-days: ${{ inputs.nuget-artifact-retention-days }}
           add-source-link-package: ${{ inputs.add-source-link-package }}
+          dry-run: ${{ inputs.dry-run }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           API_KEY: ${{ secrets.API_KEY }}

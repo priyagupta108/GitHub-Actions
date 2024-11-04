@@ -26,7 +26,10 @@ inputs:
     description: >
       The desired NuGet package version used for publishing. If not specified, the GITHUB_REF_NAME environment variable
       is used which is suitable if the version is derived from a git tag. If "USE_GITHUB_RUN_NUMBER" is used, then the
-      version is derived from the latest non-prerelease version tag and the current run number.
+      version is derived from the latest non-prerelease version tag and the current run number to create a preview
+      version (e.g. "1.0.1-preview-1" if the current version is 1.0.0). With "USE_NEXT_PATCH_VERSION" the version is
+      derived from the latest non-prerelease version tag to create the next patch version (e.g. "1.0.1" if the current
+      version is 1.0.0).
   nuget-artifact-retention-days:
     required: false
     default: '14'
@@ -39,6 +42,12 @@ inputs:
     required: false
     default: 'true'
     description: If set to "true", the Microsoft.SourceLink.GitHub NuGet package is added to the projects.
+  dry-run:
+    required: false
+    default: 'false'
+    description: |
+      If set to "true", the action will perform all package creation and validation steps without actually publishing
+      the NuGet package or creating a GitHub release.
 
 runs:
   using: composite
@@ -85,10 +94,10 @@ runs:
             Sort-Object -Descending
         $current = if ($tags.Count -gt 0) { $tags[0] } else { [version]"0.0.0" }
 
-        if ($version -eq 'USE_GITHUB_RUN_NUMBER')
+        if ($version -eq 'USE_GITHUB_RUN_NUMBER' -or $version -eq 'USE_NEXT_PATCH_VERSION')
         {
             $next = New-Object "System.Version" $current.Major, $current.Minor, ($current.Build + 1)
-            $version = "$next-preview-$Env:GITHUB_RUN_NUMBER"
+            $version = "$next$($version -eq 'USE_GITHUB_RUN_NUMBER' ? "-preview-$Env:GITHUB_RUN_NUMBER" : '')"
         }
 
         if ($tags.Count -gt 1)
@@ -186,12 +195,6 @@ runs:
       # * p:EnablePackageValidation=true is for package validation, see:
       #   https://docs.microsoft.com/en-us/dotnet/fundamentals/package-validation/overview.
       run: |
-        if ([string]::IsNullOrWhiteSpace($Env:API_KEY))
-        {
-            Write-Output "::error::API_KEY is missing or empty."
-            exit 1
-        }
-
         $noWarn = @('NU5104%3BCS1573%3BCS1591%3BVSTHRD002%3BVSTHRD200') + @'
         ${{ inputs.dotnet-pack-ignore-warning }}
         '@.Split() | ? { $_ }
@@ -221,9 +224,21 @@ runs:
 
         New-NuGetPackage @parameters
 
+        if ('${{ inputs.dry-run }}' -eq 'true')
+        {
+            Write-Output "::notice::Dry run mode: Package created successfully but will not be published."
+        }
+
     - name: Push with dotnet
+      if: inputs.dry-run != 'true'
       shell: pwsh
-      run: dotnet nuget push artifacts/*.nupkg --api-key $Env:API_KEY --source '${{ steps.setup.outputs.source-url }}' --skip-duplicate
+      run: |
+        if ([string]::IsNullOrWhiteSpace($Env:API_KEY))
+        {
+            Write-Output "::error::API_KEY is missing or empty."
+            exit 1
+        }
+        dotnet nuget push artifacts/*.nupkg --api-key $Env:API_KEY --source '${{ steps.setup.outputs.source-url }}' --skip-duplicate
 
     - name: Publish Artifacts
       uses: Lombiq/GitHub-Actions/.github/actions/upload-artifact@dev
@@ -234,9 +249,8 @@ runs:
 
     - name: Create Release
       uses: Lombiq/GitHub-Actions/.github/actions/release-action@dev
-      # This is to prevent creating releases when pushing tags for issue-specific pre-releases like
-      # v4.3.1-alpha.osoe-86.
-      if: "!contains(steps.setup.outputs.publish-version, '-')"
+      # Also preventing creating releases when pushing tags for issue-specific pre-releases like v4.3.1-alpha.osoe-86.
+      if: inputs.dry-run != 'true' && !contains(steps.setup.outputs.publish-version, '-')
       with:
         allowUpdates: true
         generateReleaseNotes: true
