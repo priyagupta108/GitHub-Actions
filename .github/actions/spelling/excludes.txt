@@ -28,6 +28,7 @@
 \.ttf$
 \.woff2$
 ^\.github/
-^LICENSE\.txt$
+CompatibilitySuppressions\.xml
 ignore$
+^LICENSE\.txt$
 pnpm-lock\.yaml$
