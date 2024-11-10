@@ -199,10 +199,13 @@ runs:
         ${{ inputs.dotnet-pack-ignore-warning }}
         '@.Split() | ? { $_ }
 
+        $version = '${{ steps.setup.outputs.publish-version }}'
+        $enablePackageValidation = !($version -like '*-*')
+
         $parameters = @{
-          EnablePackageValidation=$true
+          EnablePackageValidation=$enablePackageValidation
           PackageValidationBaselineVersion='${{ steps.setup.outputs.baseline-version }}'
-          Version='${{ steps.setup.outputs.publish-version }}'
+          Version=$version
           PackParameters = @(
             "--configuration:Release",
             "--warnaserror",
@@ -211,8 +214,8 @@ runs:
             "--verbosity:${{ inputs.verbosity }}",
             "-p:NuGetBuild=true",
             "-p:LangVersion=Latest",
-            "-p:Version=${{ steps.setup.outputs.publish-version }}",
-            "-p:NuspecProperties=version=${{ steps.setup.outputs.publish-version }}",
+            "-p:Version=$version",
+            "-p:NuspecProperties=version=$version",
             "-p:GenerateDocumentationFile=True",
             "-p:NoWarn=$($noWarn -join '%3B')",
             "-p:TreatWarningsAsErrors=true",
