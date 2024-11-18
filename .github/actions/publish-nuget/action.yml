@@ -199,10 +199,17 @@ runs:
         ${{ inputs.dotnet-pack-ignore-warning }}
         '@.Split() | ? { $_ }
 
+        $version = '${{ steps.setup.outputs.publish-version }}'
+        # Disabling package validation for alphas and issue-specific pre-releases like v4.3.1-alpha.osoe-86. This is
+        # necessary because you need to add a CompatibilitySuppressions.xml file for breaking changes (and this is also
+        # checked by Validate NuGet Publish if used) but having such suppressions are actively disallowed for
+        # pre-releases, causing "Unnecessary suppressions found." errors.
+        $enablePackageValidation = !($version -like '*-*')
+
         $parameters = @{
-          EnablePackageValidation=$true
+          EnablePackageValidation=$enablePackageValidation
           PackageValidationBaselineVersion='${{ steps.setup.outputs.baseline-version }}'
-          Version='${{ steps.setup.outputs.publish-version }}'
+          Version=$version
           PackParameters = @(
             "--configuration:Release",
             "--warnaserror",
@@ -211,8 +218,8 @@ runs:
             "--verbosity:${{ inputs.verbosity }}",
             "-p:NuGetBuild=true",
             "-p:LangVersion=Latest",
-            "-p:Version=${{ steps.setup.outputs.publish-version }}",
-            "-p:NuspecProperties=version=${{ steps.setup.outputs.publish-version }}",
+            "-p:Version=$version",
+            "-p:NuspecProperties=version=$version",
             "-p:GenerateDocumentationFile=True",
             "-p:NoWarn=$($noWarn -join '%3B')",
             "-p:TreatWarningsAsErrors=true",
