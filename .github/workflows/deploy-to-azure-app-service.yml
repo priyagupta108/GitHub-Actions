@@ -262,7 +262,6 @@ jobs:
       - name: Tag Latest and Add Timestamp Tag
         if: ${{ inputs.skip-update-latest-tag != 'true' }}
         run: |
-          git log -1
           git tag '${{ inputs.tag-prefix }}/latest'
           git push origin 'refs/tags/${{ inputs.tag-prefix }}/latest'
           git tag '${{ inputs.tag-prefix }}/${{ steps.create-timestamp.outputs.timestamp-tag }}'
