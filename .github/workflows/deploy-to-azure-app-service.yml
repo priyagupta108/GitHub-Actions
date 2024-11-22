@@ -161,6 +161,7 @@ jobs:
       - name: Checkout
         uses: Lombiq/GitHub-Actions/.github/actions/checkout@dev
         with:
+          token: ${{ secrets.CHECKOUT_TOKEN }}
 
       - name: Create Timestamp
         id: create-timestamp
