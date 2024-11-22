@@ -169,7 +169,7 @@ jobs:
 
       - name: Remove Old Latest Tags
         if: ${{ inputs.skip-update-latest-tag != 'true' }}
-        uses: Lombiq/GitHub-Actions/.github/actions/remove-old-latest-tags@dev
+        uses: Lombiq/GitHub-Actions/.github/actions/remove-old-latest-tags@issue/FLAM-27
         with:
           tag-prefix: ${{ inputs.tag-prefix }}
 
