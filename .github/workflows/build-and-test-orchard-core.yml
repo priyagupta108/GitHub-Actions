@@ -224,6 +224,7 @@ jobs:
       # The parameters added to the strategy matrix should also be used to construct the concurrency key.
       matrix:
         machine-type: ${{ fromJson(inputs.machine-types) }}
+        run-index: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] # Runs the job 10 times.
     timeout-minutes: ${{ inputs.timeout-minutes }}
     concurrency:
       # If "cancel-in-progress-for-this-pr" is set to "true" and this run is for a pull request, then the concurrency
